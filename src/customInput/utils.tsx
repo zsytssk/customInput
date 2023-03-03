@@ -1,16 +1,17 @@
-import React, { ReactNode } from 'react';
-import { BaseEditor, BaseNode, Editor, Transforms } from 'slate';
-import { useFocused, useSelected } from 'slate-react';
+import { Dropdown } from "antd";
+import React, { ReactNode } from "react";
+import { BaseEditor, BaseNode, Editor, NodeEntry, Transforms } from "slate";
+import { useFocused, useSelected } from "slate-react";
 
 export const withMentions = (editor: BaseEditor) => {
   const { isInline, isVoid } = editor;
 
   editor.isInline = (element: any) => {
-    return element.type === 'mention' ? true : isInline(element);
+    return element.type === "mention" ? true : isInline(element);
   };
 
   editor.isVoid = (element: any) => {
-    return element.type === 'mention' ? true : isVoid(element);
+    return element.type === "mention" ? true : isVoid(element);
   };
 
   return editor;
@@ -50,7 +51,7 @@ export const withTextLimit = (limit: number) =>
   };
 
 export type MentionElement = {
-  type: 'mention';
+  type: "mention";
   character: string;
   children: CustomText[];
 };
@@ -63,9 +64,9 @@ export type CustomText = {
 
 export const insertMention = (editor: BaseEditor, character: any) => {
   const mention: MentionElement = {
-    type: 'mention',
+    type: "mention",
     character,
-    children: [{ text: '' }],
+    children: [{ text: "" }],
   };
 
   editor.insertNode(mention);
@@ -75,29 +76,54 @@ export const insertMention = (editor: BaseEditor, character: any) => {
 export const Element = (props: any) => {
   const { attributes, children, element } = props;
   switch (element.type) {
-    case 'mention':
+    case "mention":
       return <Mention {...props} />;
     default:
       return <p {...attributes}>{children}</p>;
   }
 };
 
-export function Tag({ children }: { children: ReactNode[] }) {
-  return <span className="cus-tag">{children}</span>;
+export function Tag({
+  children,
+  onRemove,
+}: {
+  children: ReactNode[];
+  onRemove: () => void;
+}) {
+  return (
+    <Dropdown
+      menu={{
+        items: [{ label: "删除", key: "view" }],
+        onClick: (e) => {
+          onRemove();
+        },
+      }}
+    >
+      <span className="cus-tag">{children}</span>
+    </Dropdown>
+  );
 }
 
-const Mention = ({ attributes, children, element }: any) => {
+const Mention = (props: any) => {
+  const { attributes, children, element } = props;
   const selected = useSelected();
   const focused = useFocused();
+
   return (
     <span
       {...attributes}
       contentEditable={false}
-      className={selected && focused ? 'mention-selected' : 'mention'}
-      data-cy={`mention-${element.character.replace(' ', '-')}`}
+      className={selected && focused ? "mention-selected" : "mention"}
+      data-cy={`mention-${element.character.replace(" ", "-")}`}
     >
       {children}
-      <Tag>{element.character}</Tag>
+      <Tag
+        onRemove={() => {
+          props.onRemove(props.element);
+        }}
+      >
+        {element.character}
+      </Tag>
     </span>
   );
 };
@@ -111,7 +137,7 @@ type LocalNode = {
 export function getEditorString(editor: any) {
   const nodes = getAllNodes(editor);
 
-  let str = '';
+  let str = "";
   for (const [node] of nodes) {
     str += getNodeStr(node);
   }
@@ -122,7 +148,7 @@ export function getAllNodes(editor: any) {
   const nodes = Editor.nodes<LocalNode & BaseNode>(editor, {
     at: range,
     voids: true,
-    match: (ele) => (ele as any).text || (ele as any).type === 'mention',
+    match: (ele) => (ele as any).text || (ele as any).type === "mention",
   });
 
   return Array.from(nodes);
@@ -133,23 +159,23 @@ export function getTopNodes(editor: any) {
     at: range,
     voids: true,
     // @ts-ignore
-    match: (ele) => ele.type == 'paragraph',
+    match: (ele) => ele.type == "paragraph",
   });
 
   return Array.from(nodes);
 }
 
 export function getNodeStr(node: LocalNode) {
-  if (node.type === 'mention') {
+  if (node.type === "mention") {
     return node.character;
   } else {
-    return node.text || '';
+    return node.text || "";
   }
 }
 
 export function deleteBackward(editor: BaseEditor, n: number) {
   for (let i = 0; i < n; i++) {
-    editor.deleteBackward('character');
+    editor.deleteBackward("character");
   }
 }
 
@@ -161,6 +187,16 @@ export function clearContent(editor: BaseEditor) {
   }
 }
 
+export function removeNode(editor: BaseEditor, ele: LocalNode & BaseNode) {
+  const nodes = getAllNodes(editor);
+  for (const [node, path] of nodes) {
+    if (node === ele) {
+      Transforms.removeNodes(editor, { at: path });
+      return;
+    }
+  }
+}
+
 export function strToEditorValue(str: string) {
   const regex = /(\$\{[^\}]+\})/;
   const textArray = str.split(regex);
@@ -169,9 +205,9 @@ export function strToEditorValue(str: string) {
   for (const item of textArray) {
     if (regex.test(item)) {
       children.push({
-        type: 'mention',
+        type: "mention",
         character: item,
-        children: [{ text: '' }],
+        children: [{ text: "" }],
       });
     } else {
       children.push({ text: item });
@@ -179,7 +215,7 @@ export function strToEditorValue(str: string) {
   }
   return [
     {
-      type: 'paragraph',
+      type: "paragraph",
       children,
     },
   ];

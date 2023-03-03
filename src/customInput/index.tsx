@@ -16,6 +16,7 @@ import {
   Element,
   getEditorString,
   insertMention,
+  removeNode,
   strToEditorValue,
   withMentions,
   withTextLimit,
@@ -64,7 +65,19 @@ export function CustomInput({
       ),
     [maxLength]
   );
-  const renderElement = useCallback((props: any) => <Element {...props} />, []);
+  const renderElement = useCallback(
+    (props: any) => {
+      return (
+        <Element
+          {...props}
+          onRemove={(ele: any) => {
+            removeNode(editor, ele);
+          }}
+        />
+      );
+    },
+    [editorValue, editor]
+  );
 
   const onPaste = useCallback(
     (event: any) => {
