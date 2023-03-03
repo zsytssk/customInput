@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, user-scalable=no"
+        />
+    </head>
+    <body>
+        <div id="root"></div>
+        <script>
+            var GIT_VERSION = '<%= process.env.GIT_VERSION %>';
+            var GIT_AUTHOR_DATE = '<%= process.env.GIT_AUTHOR_DATE %>';
+            var docEl = document.documentElement;
+            var fn = function () {
+                //设置根字体大小
+                var rate = docEl.clientWidth / 375;
+                rate = rate > 2 ? 1 : rate;
+                docEl.style.fontSize = 100 * rate + 'px';
+            };
+            //绑定浏览器缩放与加载时间
+            window.addEventListener('resize', fn, false);
+            document.addEventListener('DOMContentLoaded', fn, false);
+        </script>
+    </body>
+</html>

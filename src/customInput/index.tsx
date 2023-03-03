@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import classNames from "classnames";
 import React, {
   useCallback,
   useEffect,
@@ -6,12 +6,12 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { Descendant, Transforms, createEditor } from 'slate';
-import { withHistory } from 'slate-history';
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
+} from "react";
+import { Descendant, Transforms, createEditor } from "slate";
+import { withHistory } from "slate-history";
+import { Editable, ReactEditor, Slate, withReact } from "slate-react";
 
-import { useDebounce } from './hooks';
+import { useDebounce } from "./hooks";
 import {
   Element,
   getEditorString,
@@ -19,11 +19,11 @@ import {
   strToEditorValue,
   withMentions,
   withTextLimit,
-} from './utils';
+} from "./utils";
 
-import styles from './index.module.less';
+import styles from "./index.module.less";
 
-export type CustomTextareaCtrlRef = {
+export type CustomInputCtrlRef = {
   insertTag: (text: string) => void;
 };
 type Props = {
@@ -33,10 +33,10 @@ type Props = {
   className?: string;
   placeholder?: string;
   maxLength?: number;
-  ctrlRef?: React.MutableRefObject<CustomTextareaCtrlRef | undefined>;
+  ctrlRef?: React.MutableRefObject<CustomInputCtrlRef | undefined>;
 };
 
-export function CustomTextarea({
+export function CustomInput({
   disabled,
   value,
   onChange,
@@ -50,32 +50,32 @@ export function CustomTextarea({
   const [editorValue, setEditorValue] = useState<Descendant[]>([
     {
       // @ts-ignore
-      type: 'paragraph',
-      children: [{ text: '' }],
+      type: "paragraph",
+      children: [{ text: "" }],
     },
   ]);
-  const textRef = useRef('');
+  const textRef = useRef("");
   const editor = useMemo(
     () =>
       withReact(
         withHistory(
-          withTextLimit(maxLength)(withMentions(createEditor())) as ReactEditor,
-        ),
+          withTextLimit(maxLength)(withMentions(createEditor())) as ReactEditor
+        )
       ),
-    [maxLength],
+    [maxLength]
   );
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
 
   const onPaste = useCallback(
     (event: any) => {
       const curStr = getEditorString(editor);
-      const str = event.clipboardData.getData('text');
+      const str = event.clipboardData.getData("text");
 
       if (str.length + curStr.length > maxLength) {
         event.preventDefault();
       }
     },
-    [maxLength, editor],
+    [maxLength, editor]
   );
 
   const onLocalChange = useDebounce((newEditorValue) => {
@@ -114,12 +114,12 @@ export function CustomTextarea({
         },
       };
     },
-    [editor],
+    [editor]
   );
 
   return (
     <div
-      className={classNames(className, styles.customTextareaWrap, {
+      className={classNames(className, styles.customInputWrap, {
         disabled,
         focused,
       })}
