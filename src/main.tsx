@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import ReactDom from "react-dom/client";
 
-import { CustomInput, CustomInputCtrlRef } from "./customInput";
+import { CustomInputCtrlRef } from "./customInput";
+import { CustomInput1 } from "./customInput1";
 
 import "./main.less";
 
@@ -11,11 +12,11 @@ const App = () => {
 
   return (
     <>
-      <CustomInput
+      <CustomInput1
         className="customInput"
         ctrlRef={ctrlRef}
         value={value}
-        maxLength={50}
+        // maxLength={50}
         onChange={(val) => setValue(val)}
       />
       <button

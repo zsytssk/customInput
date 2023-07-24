@@ -1,0 +1,63 @@
+.customInputWrap {
+  display: flex;
+  position: relative;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-image: none;
+  background-color: #fff;
+  padding: 4px 11px;
+  min-height: 32px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+  line-height: 1.5715;
+  &:global(.disabled) {
+    background-color: rgb(245, 245, 245);
+  }
+  &:global(.focused) {
+    box-shadow: 0 0 0 2px rgba(0, 107, 214, 0.3);
+    border-color: #006bd6;
+  }
+  :global {
+    .inner {
+      flex: 1;
+      margin-right: 10px;
+      overflow: hidden;
+      .edit_area {
+        overflow: hidden !important;
+        white-space: nowrap !important;
+      }
+      p {
+        margin: 0;
+      }
+    }
+
+    .cus-tag {
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      margin: 0 3px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 2px;
+      padding: 1px 6px;
+      height: 22px;
+      color: #000;
+    }
+    .mention-selected {
+      .cus-tag {
+        border-color: #006bd6;
+      }
+    }
+    .maxLength {
+      color: #999;
+      color: rgba(0, 0, 34, 0.5);
+      font-size: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      .in-num {
+        color: rgba(0, 0, 34, 0.91);
+      }
+    }
+  }
+}
