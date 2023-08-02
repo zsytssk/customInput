@@ -13,9 +13,9 @@
     "less": "^4.1.2",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "slate": "^0.91.4",
-    "slate-history": "^0.86.0",
-    "slate-react": "^0.91.8"
+    "slate": "0.94.1",
+    "slate-history": "0.93.0",
+    "slate-react": "0.97.2"
   },
   "devDependencies": {
     "@rollup/plugin-eslint": "^8.0.2",

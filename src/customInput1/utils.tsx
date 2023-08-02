@@ -1,6 +1,6 @@
 import { Dropdown } from "antd";
 import React, { ReactNode } from "react";
-import { BaseEditor, BaseNode, Editor, NodeEntry, Transforms } from "slate";
+import { BaseEditor, BaseNode, Editor, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
 
 export const withMentions = (editor: BaseEditor) => {
@@ -79,7 +79,7 @@ export const Element = (props: any) => {
     case "mention":
       return <Mention {...props} />;
     default:
-      return <p {...attributes}>{children}</p>;
+      return <div {...attributes}>{children}</div>;
   }
 };
 
@@ -137,11 +137,11 @@ type LocalNode = {
 export function getEditorString(editor: any) {
   const nodes = getAllNodes(editor);
 
-  let str = "";
+  const arr = [];
   for (const [node] of nodes) {
-    str += getNodeStr(node);
+    arr.push(getNodeStr(node));
   }
-  return str;
+  return arr.join(",");
 }
 export function getAllNodes(editor: any) {
   const range = Editor.range(editor, undefined as any);
@@ -198,25 +198,25 @@ export function removeNode(editor: BaseEditor, ele: LocalNode & BaseNode) {
 }
 
 export function strToEditorValue(str: string) {
-  const regex = /(\$\{[^\}]+\})/;
-  const textArray = str.split(regex);
+  if (!str) {
+    return [{ type: "paragraph", children: [{ text: "" }] }];
+  }
+
+  const textArray = str?.split(",");
 
   const children: LocalNode[] = [];
   for (const item of textArray) {
-    if (regex.test(item)) {
-      children.push({
-        type: "mention",
-        character: item,
-        children: [{ text: "" }],
-      });
-    } else {
-      children.push({ text: item });
-    }
+    children.push({
+      type: "mention",
+      character: item,
+      children: [{ text: "" }],
+    });
   }
+
   return [
     {
       type: "paragraph",
-      children,
+      children: normalizeEditorValueList(children),
     },
   ];
 }
@@ -229,12 +229,11 @@ export function normalizeEditorValueList(list: LocalNode[]) {
   if (list.length === 1 && list[0].text === "") {
     return list;
   }
-  let new_list = [...list];
-  if (new_list[0].text !== "") {
-    new_list = [{ text: "" }, ...list];
-  }
-  if (new_list[new_list.length - 1].text !== "") {
-    new_list = [...list, { text: "" }];
-  }
-  return new_list;
+  return list.reduce((arr, elem) => {
+    arr.push(elem);
+    if (elem.text !== "") {
+      arr.push({ text: "" });
+    }
+    return arr;
+  }, [] as LocalNode[]);
 }

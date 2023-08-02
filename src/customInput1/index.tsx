@@ -39,15 +39,17 @@ type Props = {
   ctrlRef?: React.MutableRefObject<CustomInputCtrlRef | undefined>;
 };
 
+/** 自定义输入框 */
 export function CustomInput1({
   disabled,
-  value,
+  value = "",
   onChange,
   className,
   placeholder,
   maxLength,
   ctrlRef,
 }: Props) {
+  const onInputChineseRef = useRef(false);
   const [focused, setFocused] = useState(false);
   const [stateId, setStateId] = useState(0);
   const [editorValue, setEditorValue] = useState<Descendant[]>([
@@ -83,7 +85,7 @@ export function CustomInput1({
         />
       );
     },
-    [editorValue, editor]
+    [editor]
   );
 
   const onPaste = useCallback(
@@ -96,7 +98,7 @@ export function CustomInput1({
         }
       }
     },
-    [maxLength]
+    [editor, maxLength]
   );
 
   const onLocalChange = useDebounce((newEditorValue) => {
@@ -110,17 +112,13 @@ export function CustomInput1({
     setEditorValue(newEditorValue);
   }, 30);
 
-  const test = useCallback(() => {
-    Transforms.move(editor, { distance: 1, unit: "line" });
-  }, [editor]);
-
   const changeToMention = useCallback(() => {
     const list = (editorValue[0] as any)?.children;
     if (!list?.length) {
       return;
     }
 
-    let new_list = [];
+    const new_list = [];
     for (const item of list) {
       if (item.text && item.type !== "mention") {
         new_list.push({
@@ -143,6 +141,8 @@ export function CustomInput1({
     clearContent(editor);
     setEditorValue(new_value as any);
     setStateId((old) => old + 1);
+    // blur -> focus 应该会重新出发 slate计算位置，不然会报错
+    ReactEditor.blur(editor);
     setTimeout(() => {
       ReactEditor.focus(editor);
       Transforms.select(editor, Editor.end(editor, []));
@@ -188,7 +188,7 @@ export function CustomInput1({
         {/* stateId让state强制更新，不然setEditorValue设置不起作用 */}
         <Slate
           editor={editor}
-          value={editorValue}
+          initialValue={editorValue}
           onChange={onLocalChange}
           key={`customTextareaWrap` + stateId}
         >
@@ -200,8 +200,14 @@ export function CustomInput1({
             onBlur={() => {
               setFocused(false);
             }}
+            onCompositionStart={() => {
+              onInputChineseRef.current = true;
+            }}
+            onCompositionEnd={() => {
+              onInputChineseRef.current = false;
+            }}
             onKeyDown={(event) => {
-              if (event.key !== "Enter") {
+              if (event.key !== "Enter" || onInputChineseRef.current) {
                 return;
               }
               event.preventDefault();
